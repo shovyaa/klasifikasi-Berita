@@ -1,0 +1,5 @@
+﻿Preprocessing,Representasi,Token unik,Jumlah kolom,Parameter terbaik,Akurasi CV,Akurasi data uji
+Tanda baca dihapus,TF-IDF,5295,4784,{'nb__alpha': 0.01},0.9812,0.975
+Tanda baca dihapus,Skip-gram,5295,100,"{'sg__vector_size': 100, 'sg__window': 5}",0.975,1.0
+Tanda baca dipertahankan,TF-IDF,5335,4824,{'nb__alpha': 0.01},0.9812,0.975
+Tanda baca dipertahankan,Skip-gram,5335,100,"{'sg__vector_size': 100, 'sg__window': 3}",0.9688,1.0

@@ -1,0 +1,10 @@
+streamlit
+gensim==4.4.0
+numpy==2.3.0
+scipy==1.15.3
+pandas
+scikit-learn
+joblib
+Sastrawi==1.0.1
+trafilatura
+requests
