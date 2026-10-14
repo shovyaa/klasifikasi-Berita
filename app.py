@@ -5,9 +5,8 @@ import pandas as pd
 import requests
 import streamlit as st
 import trafilatura
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 from gensim.models import Word2Vec
+from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
 st.set_page_config(page_title="Klasifikasi Berita", page_icon="📰")
 
@@ -16,19 +15,21 @@ st.set_page_config(page_title="Klasifikasi Berita", page_icon="📰")
 def muat_semua():
     w2v = Word2Vec.load("skipgram.model")
     nb = joblib.load("naive_bayes.joblib")
-    stop = set(StopWordRemoverFactory().get_stop_words())  # sama dengan notebook
-    stem = StemmerFactory().create_stemmer()
-    return w2v, nb, stop, stem
+    return w2v, nb
 
 
-def preprocess(teks, stop, stem):
+STOPWORD = set(StopWordRemoverFactory().get_stop_words())
+
+
+def preprocess(teks):
+    """Harus sama persis dengan preprocess_teks di notebook (skenario V1):
+    huruf kecil, hapus URL dan angka, hapus tanda baca,
+    stopword DIHAPUS, tanpa stemming."""
     teks = teks.lower()
     teks = re.sub(r"http\S+|www\S+", " ", teks)
     teks = re.sub(r"\d+", " ", teks)
-    teks = re.sub(r"[^a-zA-Z\s]", " ", teks)
-    teks = re.sub(r"\s+", " ", teks).strip()
-    tokens = [k for k in teks.split() if k not in stop]
-    return stem.stem(" ".join(tokens))
+    teks = re.sub(r"[^\w\s]|_", " ", teks)
+    return " ".join(k for k in teks.split() if k not in STOPWORD)
 
 
 def ke_vektor(teks_bersih, w2v):
@@ -44,7 +45,7 @@ def ambil_teks_dari_url(url):
 
 
 def klasifikasi_dan_tampilkan(teks):
-    bersih = preprocess(teks, stop, stem)
+    bersih = preprocess(teks)
     if not bersih:
         st.warning("Teks tidak mengandung kata yang bisa diproses.")
         return
@@ -69,7 +70,7 @@ def klasifikasi_dan_tampilkan(teks):
         st.write(bersih)
 
 
-w2v, nb, stop, stem = muat_semua()
+w2v, nb = muat_semua()
 
 st.title("📰 Klasifikasi Berita: Sport vs Finance")
 st.caption("Alur: link/teks → preprocessing → vektor Skip-gram → Naive Bayes → kategori")
